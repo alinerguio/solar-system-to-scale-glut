@@ -132,7 +132,7 @@ void init(void)
    if (light)
    {
 
-     GLfloat ambient_light[] = { 0.2, 0.2, 0.2, 1.0 };
+     GLfloat ambient_light[] = { 1.0, 1.0, 1.0, 1.0 };
      
      glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);  
      glEnable(GL_LIGHT1);
