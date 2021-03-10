@@ -50,6 +50,25 @@ GLfloat proportion = 1; /* proportion of sun and planets - its sizes and distanc
 static bool automatic = false;
 static bool light = false;
 
+#define stripeImageWidth 12
+GLubyte stripeImage[4*stripeImageWidth];
+
+#ifdef GL_VERSION_1_1
+static GLuint texName;
+#endif
+
+void makeStripeImage(void)
+{
+   int j;
+    
+   for (j = 0; j < stripeImageWidth; j++) {
+      stripeImage[4*j] = (GLubyte) 255;
+      stripeImage[4*j+1] = (GLubyte) ((j>4) ? 150 x : 0);
+      stripeImage[4*j+2] = (GLubyte) 0;
+      stripeImage[4*j+3] = (GLubyte) 255;
+   }
+}
+
 void timer()
 {
     if (automatic)
@@ -78,31 +97,64 @@ void timer()
 void init(void) 
 {
    glClearColor (0.0, 0.0, 0.0, 0.0);
+   glEnable(GL_DEPTH_TEST);
    glShadeModel (GL_SMOOTH);
+
+   makeStripeImage();
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
    glEnable(GL_COLOR_MATERIAL);
    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
    glEnable(GL_LIGHTING);
 
+#ifdef GL_VERSION_1_1
+   glGenTextures(1, &texName);
+   glBindTexture(GL_TEXTURE_1D, texName);
+#endif
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+#ifdef GL_VERSION_1_1
+   glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, stripeImageWidth, 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, stripeImage);
+#else
+   glTexImage1D(GL_TEXTURE_1D, 0, 4, stripeImageWidth, 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, stripeImage);
+#endif
+
+   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+   
+   GLfloat coeff[] = {1.0, 1.0, 1.0, 0.0};
+
+   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+   glTexGenfv(GL_S, GL_OBJECT_PLANE, coeff);
+
    if (light)
    {
 
-	   GLfloat ambient_light[] = { 0.2, 0.2, 0.2, 1.0 };
-	   
-	   glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);  
-	   glEnable(GL_LIGHT1);
+     GLfloat ambient_light[] = { 0.2, 0.2, 0.2, 1.0 };
+     
+     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);  
+     glEnable(GL_LIGHT1);
 
-	   GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
+     GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
 
-	   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	   glEnable(GL_LIGHT0);
-	
+     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+     glEnable(GL_LIGHT0);
+  
    } else {
 
-   	   glDisable(GL_LIGHT1);
-   	   glDisable(GL_LIGHT0);
+       glDisable(GL_LIGHT1);
+       glDisable(GL_LIGHT0);
 
    }
 
+   glEnable(GL_TEXTURE_GEN_S);
+   glEnable(GL_CULL_FACE);
+   glEnable(GL_AUTO_NORMAL);
+   glEnable(GL_NORMALIZE);
+   glFrontFace(GL_CW);
+   glCullFace(GL_BACK);
    glEnable(GL_DEPTH_TEST);
 }
 
@@ -112,8 +164,13 @@ void display(void)
    glColor3f (1.0, 1.0, 1.0);
 
    glPushMatrix();
+   #ifdef GL_VERSION_1_1
+   glBindTexture(GL_TEXTURE_1D, texName);
+   #endif
+   glEnable(GL_TEXTURE_1D);
    glColor3f (1.0, 1.0, 0.0);
    glutSolidSphere(1.0 * proportion, 20, 16);   /* draw sun */
+   glDisable(GL_TEXTURE_1D);
    glPopMatrix();
 
    glPushMatrix();
@@ -195,13 +252,13 @@ void reshape (int w, int h)
    gluPerspective(75.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
-   gluLookAt (0.0, 0.0, 7.5	, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+   gluLookAt (0.0, 0.0, 7.5 , 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void keyboard (unsigned char key, int x, int y)
 {
    switch (key) { // 20x times the proportional translation
-   	  case 'A': 
+      case 'A': 
       case 'a': // automatic movement
          automatic = !automatic;
          timer();
@@ -288,18 +345,18 @@ void mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON){ // zoom in
       if (state == GLUT_UP) {
-      	if (proportion < 2.55){
-      		proportion += 0.05; 
-      	}
+        if (proportion < 2.55){
+          proportion += 0.05; 
+        }
         display(); 
       }  
     }
 
     if (button == GLUT_RIGHT_BUTTON){ // zoom out
       if (state == GLUT_UP) {
-      	if(proportion >= 1.0){
-      		proportion -= 0.05; 
-      	}
+        if(proportion >= 1.0){
+          proportion -= 0.05; 
+        }
         display();
       }  
     }
