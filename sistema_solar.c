@@ -158,21 +158,20 @@ void init(void)
    glEnable(GL_DEPTH_TEST);
 }
 
-void display(void)
+void sun()
 {
-   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glColor3f (1.0, 1.0, 1.0);
-
    glPushMatrix();
    #ifdef GL_VERSION_1_1
    glBindTexture(GL_TEXTURE_1D, texName);
    #endif
    glEnable(GL_TEXTURE_1D);
-   glColor3f (1.0, 1.0, 0.0);
    glutSolidSphere(1.0 * proportion, 20, 16);   /* draw sun */
    glDisable(GL_TEXTURE_1D);
    glPopMatrix();
+}
 
+void mercury()
+{
    glPushMatrix();
    glColor3f (1.0, 0.0, 0.0);
    glRotatef ((GLfloat) year_mercury, 0.0, 0.0, 1.0);
@@ -180,7 +179,10 @@ void display(void)
    glRotatef ((GLfloat) day_mercury, 0.0, 0.0, 1.0);
    glutSolidSphere(0.0035 * proportion, 20, 16);    /* draw mercury */
    glPopMatrix();
+}
 
+void venus()
+{
    glPushMatrix();
    glColor3f (0.90, 0.90, 0.90);
    glRotatef ((GLfloat) year_venus, 0.0, 0.0, 1.0);
@@ -188,15 +190,21 @@ void display(void)
    glRotatef ((GLfloat) day_venus, 0.0, 0.0, 1.0);
    glutSolidSphere(0.0084 * proportion, 20, 16);    /* draw venus */
    glPopMatrix();
+}
 
+void earth()
+{
    glPushMatrix();
    glColor3f (0.18, 0.41, 0.59);
    glRotatef ((GLfloat) year_earth, 0.0, 0.0, 1.0);
    glTranslatef ((0.177 + 1) * proportion, 0.0, 0.0);
    glRotatef ((GLfloat) day_earth, 0.0, 0.0, 1.0);
    glutSolidSphere(0.009 * proportion, 20, 16);    /* draw earth */
-   glPopMatrix();
+   glPopMatrix(); 
+}
 
+void mars()
+{
    glPushMatrix();
    glColor3f (0.6, 0.24, 0.0);
    glRotatef ((GLfloat) year_mars, 0.0, 0.0, 1.0);
@@ -204,7 +212,10 @@ void display(void)
    glRotatef ((GLfloat) day_mars, 0.0, 0.0, 1.0);
    glutSolidSphere(0.0048 * proportion, 20, 16);    /* draw mars */
    glPopMatrix();
+}
 
+void jupiter()
+{
    glPushMatrix();
    glColor3f (0.69, 0.5, 0.21);
    glRotatef ((GLfloat) year_jupiter, 0.0, 0.0, 1.0);
@@ -213,6 +224,10 @@ void display(void)
    glutSolidSphere(0.1029 * proportion, 20, 16);    /* draw jupiter */
    glPopMatrix();
 
+}
+
+void saturn()
+{
    glPushMatrix();
    glRotatef ((GLfloat) year_saturn, 0.0, 0.0, 1.0);
    glTranslatef ((1.693 + 1) * proportion, 0.0, 0.0);
@@ -222,15 +237,21 @@ void display(void)
    glColor3f (0.69, 0.56, 0.21);
    glutSolidSphere(0.0847 * proportion, 20, 16);    /* draw saturn */
    glPopMatrix();
+}
 
-   glPushMatrix();
+void uranus()
+{
+  glPushMatrix();
    glColor3f (0.33, 0.50, 0.67);
    glRotatef ((GLfloat) year_uranus, 0.0, 0.0, 1.0);
    glTranslatef ((3.404 + 1) * proportion, 0.0, 0.0);
    glRotatef ((GLfloat) day_uranus, 0.0, 0.0, 1.0);
    glutSolidSphere(0.0363 * proportion, 20, 16);    /* draw uranus */
    glPopMatrix();
+}
 
+void neptune()
+{
    glPushMatrix();
    glColor3f (0.21, 0.40, 0.58);
    glRotatef ((GLfloat) year_neptune, 0.0, 0.0, 1.0);
@@ -238,7 +259,23 @@ void display(void)
    glRotatef ((GLfloat) day_neptune, 0.0, 0.0, 1.0);
    glutSolidSphere(0.0363 * proportion, 20, 16);    /* draw neptune */
    glPopMatrix();
+} 
 
+void display(void)
+{
+   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glColor3f (1.0, 1.0, 1.0);
+
+   glPushMatrix();
+     sun();
+     mercury();
+     venus();
+     earth();
+     mars();
+     jupiter();
+     saturn();
+     uranus();
+     neptune();
    glPopMatrix();
    
    glutSwapBuffers();
