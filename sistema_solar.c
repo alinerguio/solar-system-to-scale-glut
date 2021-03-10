@@ -44,9 +44,11 @@ static double year_mercury = 0, day_mercury = 0, year_venus = 0, day_venus = 0;
 static double year_earth = 0, day_earth = 0, year_mars = 0, day_mars = 0;
 static double year_jupiter = 0, day_jupiter = 0, year_saturn = 0, day_saturn = 0;
 static double year_uranus = 0, day_uranus = 0, year_neptune = 0, day_neptune = 0;
+
 GLfloat proportion = 1; /* proportion of sun and planets - its sizes and distances */
 
 static bool automatic = false;
+static bool light = false;
 
 void timer()
 {
@@ -75,22 +77,32 @@ void timer()
 
 void init(void) 
 {
-   GLfloat ambient_light[] = { 0.2, 0.2, 0.2, 1.0 };
-   GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
-
    glClearColor (0.0, 0.0, 0.0, 0.0);
    glShadeModel (GL_SMOOTH);
-
-   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-   glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);  
-
    glEnable(GL_COLOR_MATERIAL);
    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-
-   glEnable(GL_LIGHT0);
-   glEnable(GL_LIGHT1);
-
    glEnable(GL_LIGHTING);
+
+   if (light)
+   {
+
+	   GLfloat ambient_light[] = { 0.2, 0.2, 0.2, 1.0 };
+	   
+	   glLightfv(GL_LIGHT1, GL_AMBIENT, ambient_light);  
+	   glEnable(GL_LIGHT1);
+
+	   GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
+
+	   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	   glEnable(GL_LIGHT0);
+	
+   } else {
+
+   	   glDisable(GL_LIGHT1);
+   	   glDisable(GL_LIGHT0);
+
+   }
+
    glEnable(GL_DEPTH_TEST);
 }
 
@@ -102,7 +114,9 @@ void display(void)
    glPushMatrix();
    glColor3f (1.0, 1.0, 0.0);
    glutSolidSphere(1.0 * proportion, 20, 16);   /* draw sun */
+   glPopMatrix();
 
+   glPushMatrix();
    glColor3f (1.0, 0.0, 0.0);
    glRotatef ((GLfloat) year_mercury, 0.0, 0.0, 1.0);
    glTranslatef ((0.069 + 1) * proportion, 0.0, 0.0);
@@ -187,9 +201,10 @@ void reshape (int w, int h)
 void keyboard (unsigned char key, int x, int y)
 {
    switch (key) { // 20x times the proportional translation
-   	  case 'A':
+   	  case 'A': 
+      case 'a': // automatic movement
          automatic = !automatic;
-         timer(0);
+         timer();
          break;
       case 'm': // mercury
          year_mercury = fmod((year_mercury + 81.8), 360.0);
@@ -255,7 +270,13 @@ void keyboard (unsigned char key, int x, int y)
          year_neptune = fmod((year_neptune - 0.1), 360.0);
          glutPostRedisplay();
          break;
-      case 27:
+      case 'L': 
+      case 'l': // turn off light
+         light = !light;
+         init ();
+         glutPostRedisplay();
+         break;
+      case 27: // exit
          exit(0);
          break;
       default:
