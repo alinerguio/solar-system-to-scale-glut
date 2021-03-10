@@ -63,7 +63,7 @@ void makeStripeImage(void)
     
    for (j = 0; j < stripeImageWidth; j++) {
       stripeImage[4*j] = (GLubyte) 255;
-      stripeImage[4*j+1] = (GLubyte) ((j>4) ? 150 x : 0);
+      stripeImage[4*j+1] = (GLubyte) ((j>4) ? 100 : 0);
       stripeImage[4*j+2] = (GLubyte) 0;
       stripeImage[4*j+3] = (GLubyte) 255;
    }
